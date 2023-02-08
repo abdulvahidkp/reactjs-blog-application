@@ -1,5 +1,6 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import {format} from 'date-fns'
 
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -56,13 +57,28 @@ export default function App() {
     },
   ]);
   const [search, setSearch] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newBody, setNewBody] = useState("");
 
   const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const newPost = {id, title:newTitle,body:newBody ,datetime};
+    const allPosts = [...posts,newPost]
+    setPosts(allPosts);
+    setNewTitle('')
+    setNewBody('')
+    navigate('/')
+  };
+
   const handleDelete = (id) => {
-    const postLists = posts.filter((post)=>post.id != id);
-    setPosts(postLists)
-    navigate            ('/')
-  }
+    const postLists = posts.filter((post) => post.id != id);
+    setPosts(postLists);
+    navigate("/");
+  };
 
   return (
     <div>
@@ -70,8 +86,24 @@ export default function App() {
       <Navbar search={search} setSearch={setSearch} />
       <Routes>
         <Route exact path="/" element={<Home posts={posts} />} />
-        <Route exact path="/post/:id" element={<OnePostPage posts={posts} handleDelete={handleDelete} />} />
-        <Route exact path="/newPost" element={<NewPost />} />
+        <Route
+          exact
+          path="/post/:id"
+          element={<OnePostPage posts={posts} handleDelete={handleDelete} />}
+        />
+        <Route
+          exact
+          path="/newPost"
+          element={
+            <NewPost
+              newTitle={newTitle}
+              setNewTitle={setNewTitle}
+              newBody={newBody}
+              setNewBody={setNewBody}
+              handleSubmit={handleSubmit}
+            />
+          }
+        />
         <Route exact path="/about" element={<About />} />
         <Route exact path="*" element={<Missing />} />
       </Routes>
