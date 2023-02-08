@@ -8,7 +8,7 @@ function Footer() {
       <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
         &copy; {today.getFullYear()+` `} 
         <a  class="hover:underline">
-           abdulvahid™
+           abdulvahidkp
         </a>
         . All Rights Reserved.
       </span>
