@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import Header from "./components/Header";
@@ -57,14 +57,21 @@ export default function App() {
   ]);
   const [search, setSearch] = useState("");
 
+  const navigate = useNavigate();
+  const handleDelete = (id) => {
+    const postLists = posts.filter((post)=>post.id != id);
+    setPosts(postLists)
+    navigate            ('/')
+  }
+
   return (
     <div>
       <Header title={"ReactJs Blog"} />
       <Navbar search={search} setSearch={setSearch} />
       <Routes>
         <Route exact path="/" element={<Home posts={posts} />} />
+        <Route exact path="/post/:id" element={<OnePostPage posts={posts} handleDelete={handleDelete} />} />
         <Route exact path="/newPost" element={<NewPost />} />
-        <Route exact path="/post/:id" element={<OnePostPage />} />
         <Route exact path="/about" element={<About />} />
         <Route exact path="*" element={<Missing />} />
       </Routes>
