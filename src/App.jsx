@@ -56,9 +56,19 @@ export default function App() {
       body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
     },
   ]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchResults,setSearchResults] = useState([])
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
+
+  useEffect(()=>{
+    console.log((posts[0].body).toLowerCase().includes(search.toLowerCase()));
+    const filteredResults = posts.filter((post)=>
+      ((post.body).toLowerCase()).includes(search.toLowerCase())
+      || ((post.title).toLowerCase()).includes(search.toLowerCase())
+    )
+    setSearchResults(filteredResults.reverse())
+  },[search,posts])
 
   const navigate = useNavigate();
 
@@ -85,7 +95,7 @@ export default function App() {
       <Header title={"ReactJs Blog"} />
       <Navbar search={search} setSearch={setSearch} />
       <Routes>
-        <Route exact path="/" element={<Home posts={posts} />} />
+        <Route exact path="/" element={<Home posts={searchResults} />} />
         <Route
           exact
           path="/post/:id"
