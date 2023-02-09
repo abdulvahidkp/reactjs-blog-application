@@ -1,7 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {format} from 'date-fns'
-import api from './api/posts'
+import { format } from "date-fns";
+import api from "./api/posts";
 
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -11,63 +11,83 @@ import NewPost from "./pages/NewPost";
 import OnePostPage from "./pages/PostPage";
 import About from "./pages/About";
 import Missing from "./pages/Missing";
+import Edit from "./pages/Edit";
 
 export default function App() {
   const [posts, setPosts] = useState([]);
-  const [search, setSearch] = useState('');
-  const [searchResults,setSearchResults] = useState([])
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await api.get('/posts');
-        setPosts(response.data)
+        const response = await api.get("/posts");
+        setPosts(response.data);
       } catch (error) {
-        if(error.response){
+        if (error.response) {
           // not in the 200 response range
-          console.log(error.response.data)
-          console.log(error.response.status)
-          console.log(error.response.headers)
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
         } else {
           console.log(`Error: ${error.message}`);
         }
         //
       }
-    }
-    fetchPosts()
-  },[])
+    };
+    fetchPosts();
+  }, []);
 
-  useEffect(()=>{
-      const filteredResults = posts.filter((post)=>
-        ((post.body).toLowerCase()).includes(search.toLowerCase())
-        || ((post.title).toLowerCase()).includes(search.toLowerCase())
-      )
-      setSearchResults(filteredResults.reverse())
-  },[search,posts])
+  useEffect(() => {
+    const filteredResults = posts.filter(
+      (post) =>
+        post.body.toLowerCase().includes(search.toLowerCase()) ||
+        post.title.toLowerCase().includes(search.toLowerCase())
+    );
+    setSearchResults(filteredResults.reverse());
+  }, [search, posts]);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
-    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
-    const newPost = {id, title:newTitle,body:newBody ,datetime};
+    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    const newPost = { id, title: newTitle, body: newBody, datetime };
     try {
-      const response = await api.post('/posts',newPost);
-      const allPosts = [...posts,response.data]
+      const response = await api.post("/posts", newPost);
+      const allPosts = [...posts, response.data];
       setPosts(allPosts);
-      setNewTitle('')
-      setNewBody('')
-      navigate('/')
-      
+      setNewTitle("");
+      setNewBody("");
+      navigate("/");
     } catch (error) {
-      console.log(`Error: ${error.message}`) 
+      console.log(`Error: ${error.message}`);
     }
   };
 
-  const handleDelete = (id) => {
+  const handleEditSubmit = async (id) => {
+    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    const updatePost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await api.put(`/posts/${id}`, updatePost);
+      setPosts(
+        posts.map((post) => (post.id === id ? { ...response.data } : post))
+      );
+      setEditTitle("");
+      setEditBody("");
+      navigate("/");
+    } catch (error) {
+        console.log(error.message)
+    }
+  };
+
+  const handleDelete = async (id) => {
+    await api.delete(`/posts/${id}`)
     const postLists = posts.filter((post) => post.id != id);
     setPosts(postLists);
     navigate("/");
@@ -94,6 +114,20 @@ export default function App() {
               newBody={newBody}
               setNewBody={setNewBody}
               handleSubmit={handleSubmit}
+            />
+          }
+        />
+        <Route
+          exact
+          path="/editPost/:id"
+          element={
+            <Edit
+              posts={posts}
+              editTitle={editTitle}
+              setEditTitle={setEditTitle}
+              editBody={editBody}
+              setEditBody={setEditBody}
+              handleEditSubmit={handleEditSubmit}
             />
           }
         />

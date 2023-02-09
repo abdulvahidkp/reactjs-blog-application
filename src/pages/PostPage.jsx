@@ -13,9 +13,16 @@ function OnePostPage({ posts, handleDelete }) {
                   <h2 className="postTitle font-bold capitalize text-2xl">{post.title}</h2>
                   <p className="postDate mt-3">{post.datetime}</p>
                   <p className="postBody mt-5">{post.body}</p>
-                  <button className="deletButton bg-red-500 rounded p-2 hover:bg-red-600 mt-5" onClick={()=>handleDelete(id)}>
-                    Delete post
-                  </button>
+                  <div className="flex space-x-3">
+                    <Link to={`/editPost/${post.id}`}>
+                        <button className="deletButton bg-cyan-500 rounded p-2 hover:bg-cyan-600 mt-5">
+                          Edit Post
+                        </button>
+                    </Link>
+                    <button className="deletButton bg-red-500 rounded p-2 hover:bg-red-600 mt-5" onClick={()=>handleDelete(id)}>
+                          Delete post
+                    </button>
+                  </div>
                 </>
               }
               {!post && 
