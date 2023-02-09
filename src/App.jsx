@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {format} from 'date-fns'
+import api from './api/posts'
 
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
@@ -12,62 +13,38 @@ import About from "./pages/About";
 import Missing from "./pages/Missing";
 
 export default function App() {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "my first Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 2,
-      title: "my second Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 3,
-      title: "my third Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 4,
-      title: "my fourth Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 5,
-      title: "my fifth Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 6,
-      title: "my sixth Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-    {
-      id: 7,
-      title: "my seventh Post",
-      datetime: "july 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. ",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState('');
   const [searchResults,setSearchResults] = useState([])
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
 
   useEffect(()=>{
-    console.log((posts[0].body).toLowerCase().includes(search.toLowerCase()));
-    const filteredResults = posts.filter((post)=>
-      ((post.body).toLowerCase()).includes(search.toLowerCase())
-      || ((post.title).toLowerCase()).includes(search.toLowerCase())
-    )
-    setSearchResults(filteredResults.reverse())
+    const fetchPosts = async () => {
+      try {
+        const response = await api.get('/posts');
+        setPosts(response.data)
+      } catch (error) {
+        if(error.response){
+          // not in the 200 response range
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+        //
+      }
+    }
+    fetchPosts()
+  },[])
+
+  useEffect(()=>{
+      const filteredResults = posts.filter((post)=>
+        ((post.body).toLowerCase()).includes(search.toLowerCase())
+        || ((post.title).toLowerCase()).includes(search.toLowerCase())
+      )
+      setSearchResults(filteredResults.reverse())
   },[search,posts])
 
   const navigate = useNavigate();
